@@ -20,7 +20,6 @@ export function useWebHidMonitor() {
   // Initialize with tab ID and register with background
   useEffect(() => {
     console.log(`[Hook] DevTools panel initializing`);
-    // const inspectedTabId = (window as any).inspectedTabId;
     const inspectedTabId = chrome.devtools.inspectedWindow.tabId;
 
     console.log(`[Hook] Inspected tab ID: ${inspectedTabId}`);
