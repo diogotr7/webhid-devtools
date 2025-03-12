@@ -28,21 +28,26 @@ function injectMonitor(): boolean {
         "*"
       );
     } catch (error) {
-      console.error("[WebHID Injector] Error sending message:", error);
+      console.error(
+        "[Background][WebHID Injector] Error sending message:",
+        error
+      );
     }
   }
 
-  console.debug("[WebHID Injector] Injecting WebHID interceptor");
+  console.debug("[Background][WebHID Injector] Injecting WebHID interceptor");
 
   // Skip if WebHID API is not available
   if (!navigator.hid) {
-    console.debug("[WebHID Injector] WebHID API not available");
+    console.debug("[Background][WebHID Injector] WebHID API not available");
     return false;
   }
 
   // Skip if already intercepted
   if ((navigator.hid as any)._intercepted) {
-    console.debug("[WebHID Injector] WebHID API already intercepted");
+    console.debug(
+      "[Background][WebHID Injector] WebHID API already intercepted"
+    );
     return false;
   }
 
@@ -223,12 +228,12 @@ function injectMonitor(): boolean {
     (navigator.hid as any)._intercepted = true;
 
     console.log(
-      "[WebHID Injector] WebHID API methods successfully intercepted"
+      "[Background][WebHID Injector] WebHID API methods successfully intercepted"
     );
 
     return true;
   } catch (error) {
-    console.error(`[WebHID Background] Injection error:`, error);
+    console.error(`[Background][WebHID Injector] Injection error:`, error);
 
     return false;
   }

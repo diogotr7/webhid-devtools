@@ -2,8 +2,10 @@ import { injectInterceptor } from "./injectWebHid";
 
 export default defineBackground(() => {
   const activeDevtoolsTabs = new Set<number>();
+  console.log("[Background] Background script loaded");
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("[Background] Received message", message);
     if (!message || typeof message !== "object") return false;
 
     switch (message.source) {
@@ -32,20 +34,16 @@ export default defineBackground(() => {
         const { action, tabId } = message;
 
         if (action === "register-devtools" && tabId) {
+          console.log("[Background] Registering DevTools", tabId);
           activeDevtoolsTabs.add(tabId);
 
           // Initial injection
           injectInterceptor(tabId).then((success) => {
-            chrome.tabs.sendMessage(tabId, {
-              source: "background",
-              eventType: "injection-status",
-              data: { success, tabId },
-              timestamp: Date.now(),
-            });
+            console.log("[Background] Injection status", success, tabId);
+            sendResponse({ success: true });
           });
-
-          sendResponse({ success: true });
         } else if (action === "unregister-devtools" && tabId) {
+          console.log("[Background] Unregistering DevTools", tabId);
           activeDevtoolsTabs.delete(tabId);
           sendResponse({ success: true });
         }
@@ -60,6 +58,7 @@ export default defineBackground(() => {
 
   // Re-inject monitor when tab is updated if DevTools is registered
   chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    console.log("[Background] Tab updated", tabId, changeInfo);
     if (changeInfo.status === "complete" && activeDevtoolsTabs.has(tabId)) {
       injectInterceptor(tabId);
     }
@@ -67,6 +66,7 @@ export default defineBackground(() => {
 
   // Remove tab from active tabs when closed
   chrome.tabs.onRemoved.addListener((tabId) => {
+    console.log("[Background] Tab removed", tabId);
     activeDevtoolsTabs.delete(tabId);
   });
 });

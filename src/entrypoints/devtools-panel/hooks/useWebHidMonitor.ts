@@ -19,28 +19,40 @@ export function useWebHidMonitor() {
 
   // Initialize with tab ID and register with background
   useEffect(() => {
-    console.debug(`[WebHID Monitor] DevTools panel initializing`);
-    const inspectedTabId = (window as any).inspectedTabId;
+    console.log(`[Hook] DevTools panel initializing`);
+    // const inspectedTabId = (window as any).inspectedTabId;
+    const inspectedTabId = chrome.devtools.inspectedWindow.tabId;
 
-    if (inspectedTabId) {
-      setTabId(inspectedTabId);
+    console.log(`[Hook] Inspected tab ID: ${inspectedTabId}`);
 
-      // Register with background script
-      chrome.runtime
-        .sendMessage({
-          source: "webhid-devtools",
-          action: "register-devtools",
-          tabId: inspectedTabId,
-        })
-        .then(() => {
-          console.debug(
-            `[WebHID Monitor] Registered with background for tab ${inspectedTabId}`
-          );
-        })
-        .catch((error) => {
-          console.debug(`[WebHID Monitor] Registration error: ${error}`);
-        });
+    if (
+      inspectedTabId === null ||
+      inspectedTabId === undefined ||
+      typeof inspectedTabId !== "number"
+    ) {
+      console.log(
+        "[Hook] Error: Inspected tab ID not found, closing",
+        inspectedTabId
+      );
     }
+
+    setTabId(inspectedTabId);
+
+    // Register with background script
+    chrome.runtime
+      .sendMessage({
+        source: "webhid-devtools",
+        action: "register-devtools",
+        tabId: inspectedTabId,
+      })
+      .then(() => {
+        console.log(
+          `[Hook] Registered with background for tab ${inspectedTabId}`
+        );
+      })
+      .catch((error) => {
+        console.log(`[Hook] Registration error: ${error}`);
+      });
 
     // Setup cleanup
     return () => {
@@ -66,9 +78,7 @@ export function useWebHidMonitor() {
         message.tabId === tabId
       ) {
         const webhidData = message.data;
-        console.debug(
-          `[WebHID Monitor] Received WebHID event: ${webhidData.eventType}`
-        );
+        console.log(`[Hook] Received WebHID event: ${webhidData.eventType}`);
 
         // Add new packet to the list (limited to MAX_PACKETS)
         setPackets((prev) =>

@@ -10,6 +10,7 @@ export default defineConfig({
       "activeTab", // Required to send messages to the active tab
       "scripting", // Required to inject scripts
     ],
+    host_permissions: ["*://*/*"],
   },
   srcDir: "src",
 });
