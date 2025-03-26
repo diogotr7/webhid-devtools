@@ -1,5 +1,3 @@
-import { injectInterceptor } from "./injectWebHid";
-
 export default defineBackground(() => {
   const activeDevtoolsTabs = new Set<number>();
   console.log("[Background] Background script loaded");
@@ -37,11 +35,18 @@ export default defineBackground(() => {
           console.log("[Background] Registering DevTools", tabId);
           activeDevtoolsTabs.add(tabId);
 
-          // Initial injection
-          injectInterceptor(tabId).then((success) => {
-            console.log("[Background] Injection status", success, tabId);
-            sendResponse({ success: true });
-          });
+          browser.scripting
+            .executeScript({
+              target: { tabId },
+              world: "MAIN",
+              files: ["/content-scripts/inject.js"],
+            })
+            .then((success) => {
+              console.log("[Background] Injection status", success, tabId);
+            })
+            .catch((error) => {
+              console.error("[Background] Injection error", error);
+            });
         } else if (action === "unregister-devtools" && tabId) {
           console.log("[Background] Unregistering DevTools", tabId);
           activeDevtoolsTabs.delete(tabId);
@@ -60,7 +65,18 @@ export default defineBackground(() => {
   chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     console.log("[Background] Tab updated", tabId, changeInfo);
     if (changeInfo.status === "complete" && activeDevtoolsTabs.has(tabId)) {
-      injectInterceptor(tabId);
+      browser.scripting
+        .executeScript({
+          target: { tabId },
+          world: "MAIN",
+          files: ["/content-scripts/inject.js"],
+        })
+        .then((success) => {
+          console.log("[Background] Injection status", success, tabId);
+        })
+        .catch((error) => {
+          console.error("[Background] Injection error", error);
+        });
     }
   });
 
