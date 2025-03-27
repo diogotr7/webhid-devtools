@@ -3,7 +3,7 @@ export default defineBackground(() => {
   console.log("[Background] Background script loaded");
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("[Background] Received message", message);
+    console.debug("[Background] Received message", message);
     if (!message || typeof message !== "object") return false;
 
     switch (message.source) {

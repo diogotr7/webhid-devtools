@@ -567,6 +567,14 @@
     "@types/filesystem" "*"
     "@types/har-format" "*"
 
+"@types/chrome@^0.0.312":
+  version "0.0.312"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.312.tgz#d5542be84020644a81981bc2b77ebcfe05cde53e"
+  integrity sha512-m204djOoU/YqF1dRw3YLk2L3tcDTYREUERDQDUAmROK3Rv94nLbMJ4uvjzr/Yj/A7SyEpTrpoCuXBKTuerEdqg==
+  dependencies:
+    "@types/filesystem" "*"
+    "@types/har-format" "*"
+
 "@types/estree@1.0.6", "@types/estree@^1.0.0":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.6.tgz#628effeeae2064a1b4e79f78e81d87b7e5fc7b50"
